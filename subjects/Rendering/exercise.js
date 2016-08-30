@@ -28,10 +28,43 @@ const DATA = {
   ]
 }
 
+let type = 'mexican';
+let sortOrder = '';
+
+function changeType(e){
+  type = e.target.value;
+  updateThePage();
+}
+
+function reverseSort(){
+  if (sortOrder === ''){
+    sortOrder = '-'
+  } else {
+    sortOrder = ''
+  }
+  updateThePage();
+}
+
+function updateThePage() {
+  render(<Menu/>, document.getElementById('app'))
+}
+
 function Menu() {
+  const items = DATA.items.filter((item) => item.type === type)
+      .sort(sortBy(sortOrder+'name')).map((item) => (
+      <li key={item.id}>{item.name}</li>
+  ))
   return (
     <div>
-      Open the console, you have failing tests.
+      <select onChange={changeType}>
+        <option>mexican</option>
+        <option>english</option>
+      </select>
+      <button onClick={reverseSort}>
+        Reverse Sort
+      </button>
+      <h1>{DATA.title}</h1>
+      <ul>{items}</ul>
     </div>
   )
 }
