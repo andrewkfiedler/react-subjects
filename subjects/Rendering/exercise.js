@@ -56,9 +56,9 @@ function Menu() {
   ))
   return (
     <div>
-      <select onChange={changeType}>
-        <option>mexican</option>
-        <option>english</option>
+      <select defaultValue={type} onChange={changeType}>
+        <option value="mexican">mexican</option>
+        <option value="english">english</option>
       </select>
       <button onClick={reverseSort}>
         Reverse Sort
