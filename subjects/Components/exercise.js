@@ -25,6 +25,12 @@ styles.tab = {
   cursor: 'pointer'
 }
 
+/*
+  identical to ...
+  styles.activeTab = Object.assign(styles.tab, {
+    borderBottomColor: '#000'
+  });
+ */
 styles.activeTab = {
   ...styles.tab,
   borderBottomColor: '#000'
@@ -35,17 +41,40 @@ styles.panel = {
 }
 
 const Tabs = React.createClass({
+  propTypes: {
+    activeTabIndex: React.PropTypes.number
+  },
+  getInitialState() {
+    return {
+      activeTabIndex: 0
+    }
+  },
+  updateActiveTab: function(id){
+    this.setState({
+      activeTabIndex: id
+    });
+  },
+  determineStyle: function(index) {
+    return index === this.state.activeTabIndex ? styles.activeTab : styles.tab
+  },
+  getTabs() {
+    return this.props.data.map((country, index) => (
+        <div onClick={() =>  this.updateActiveTab(index) }
+             key={country.id} className="Tab"
+             style={this.determineStyle(index)}>
+          {country.name}
+        </div>
+    ))
+  },
+  determineContent() {
+    return this.props.data[this.state.activeTabIndex].description
+  },
   render() {
     return (
       <div className="Tabs">
-        <div className="Tab" style={styles.activeTab}>
-          Active
-        </div>
-        <div className="Tab" style={styles.tab}>
-          Inactive
-        </div>
+        {this.getTabs()}
         <div className="TabPanel" style={styles.panel}>
-          Panel
+          {this.determineContent()}
         </div>
       </div>
     )
@@ -64,7 +93,7 @@ const App = React.createClass({
 })
 
 const DATA = [
-  { id: 1, name: 'USA', description: 'Land of the Free, Home of the brave' },
+  { id: 123, name: 'USA', description: 'Land of the Free, Home of the brave' },
   { id: 2, name: 'Brazil', description: 'Sunshine, beaches, and Carnival' },
   { id: 3, name: 'Russia', description: 'World Cup 2018!' }
 ]
