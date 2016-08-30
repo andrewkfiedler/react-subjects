@@ -64,6 +64,27 @@ const Tabs = React.createClass({
 
 })
 
+const StatefulTabs = React.createClass({
+    getInitialState() {
+      return {
+        activeTabIndex: 0
+      }
+    },
+    render() {
+      return (
+          <Tabs
+              {...this.props}
+              activeTabIndex={this.state.activeTabIndex}
+              onActivateTab={(nextIndex) => {
+                this.setState({
+                  activeTabIndex: nextIndex
+                })
+              }}
+              />
+      )
+    }
+})
+
 const App = React.createClass({
   getInitialState() {
       return {
@@ -75,6 +96,7 @@ const App = React.createClass({
     return (
       <div>
         <h1>Props v. State</h1>
+        <h4>Controlled Component</h4>
         <Tabs
             ref="tabs"
             data={this.props.tabs}
@@ -84,6 +106,10 @@ const App = React.createClass({
                   activeTabIndex: nextIndex
                 })
             }}
+            />
+        <h4>Stateful Component</h4>
+        <StatefulTabs
+            data={this.props.tabs}
             />
       </div>
     )
