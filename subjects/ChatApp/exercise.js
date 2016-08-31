@@ -43,54 +43,154 @@ The world is your oyster!
 */
 
 const Chat = React.createClass({
+  getInitialState() {
+    return {
+      error: null,
+      auth: null,
+      messages: [],
+      messageToSend: '',
+        usernameFilter: '',
+        contentFilter: ''
+    }
+  },
+  groupMessages(messages) {
+      return messages.filter((message) => (
+          message.username.indexOf(this.state.usernameFilter) > -1
+      )).filter((message) => (
+          message.text.indexOf(this.state.contentFilter) > -1
+      )).reduce((currentGroupings, message) => {
+          if (currentGroupings.length === 0 ){
+            currentGroupings.push({
+              username: message.username,
+              avatarURL: message.avatarURL,
+              messages: [message]
+            })
+          } else {
+            if (currentGroupings[currentGroupings.length-1].username === message.username){
+              currentGroupings[currentGroupings.length-1].messages.push(message);
+            } else {
+              currentGroupings.push({
+                username: message.username,
+                avatarURL: message.avatarURL,
+                messages: [message]
+              })
+            }
+          }
+        return currentGroupings;
+      }, [])
+  },
+  doImperativeThings() {
+      login((error, auth) => {
+        this.setState({
+          error: error,
+          auth: auth
+        })
+        subscribeToMessages(messages => {
+          this.setState({
+            messages: messages
+          })
+        })
+      })
+  },
+  componentDidMount() {
+    this.doImperativeThings()
+  },
+    // last chance to measure before render
+    componentWillUpdate() {
+        const {scrollTop, scrollHeight, clientHeight} = this.refs.scroller;
+        this.autoScroll = ((scrollHeight - clientHeight) - scrollTop) < 10;
+    },
+    // immediately after render
+  componentDidUpdate() {
+      if (this.autoScroll) {
+          this.refs.scroller.scrollTop = this.refs.scroller.scrollHeight
+      }
+  },
   render() {
+    const {
+        usernameFilter,
+        contentFilter,
+        error,
+        auth,
+        messages,
+        messageToSend
+        } = this.state
     return (
       <div className="chat">
+        {(error !== null) && (<div>There was an issue logging in: {error.toString()}</div>)}
+        {(auth !== null) && (<div>Logged in as: {auth.github.displayName}</div>)}
         <header className="chat-header">
           <h1 className="chat-title">HipReact</h1>
           <p className="chat-message-count"># messages: 3</p>
         </header>
-        <div className="messages">
+          <div className="chat-filter">
+              <input className="filter-username" value={usernameFilter}
+                     placeholder="Filter by Username"
+                     onChange={(e) => {
+                        this.setState({
+                            usernameFilter: e.target.value
+                        })
+                        this.setState({filteredMessages: this.groupMessages(this.state.messages)})
+                     }}
+                  />
+              <input className="filter-content" value={contentFilter}
+                     placeholder="Filter by Content"
+                     onChange={(e) => {
+                        this.setState({
+                        contentFilter: e.target.value
+                        })
+                        this.setState({filteredMessages: this.groupMessages(this.state.messages)})
+                     }}
+                  />
+          </div>
+        <div className="messages" ref="scroller">
           <ol className="message-groups">
-            <li className="message-group">
-              <div className="message-group-avatar">
-                <img src="https://avatars1.githubusercontent.com/u/92839"/>
-              </div>
-              <ol className="messages">
-                <li className="message">So, check it out:</li>
-                <li className="message">QA Engineer walks into a bar.</li>
-                <li className="message">Orders a beer.</li>
-                <li className="message">Orders 0 beers.</li>
-                <li className="message">Orders 999999999 beers.</li>
-                <li className="message">Orders a lizard.</li>
-                <li className="message">Orders -1 beers.</li>
-                <li className="message">Orders a sfdeljknesv.</li>
-              </ol>
-            </li>
-            <li className="message-group">
-              <div className="message-group-avatar">
-                <img src="https://avatars2.githubusercontent.com/u/100200"/>
-              </div>
-              <ol className="messages">
-                <li className="message">Haha</li>
-                <li className="message">Stop stealing other people's jokes :P</li>
-              </ol>
-            </li>
-            <li className="message-group">
-              <div className="message-group-avatar">
-                <img src="https://avatars1.githubusercontent.com/u/92839"/>
-              </div>
-              <ol className="messages">
-                <li className="message">:'(</li>
-              </ol>
-            </li>
+            {this.groupMessages(messages).map((message) => {
+              return <li className="message-group"
+                  style={message.username === auth.github.username ? {
+                  background: "rgba(0,255,0,.05)",
+                  "font-size": '2rem',
+                  "min-height": '80px'
+                  } : {}}>
+                <div className="message-group-avatar">
+                  <img src={message.avatarURL}
+                       style={message.username === auth.github.username ? {
+                  width: '80px',
+                  height: '80px'
+                  } : {}}/>
+                </div>
+                <ol className="messages">
+                  {message.messages.map((innerMessage) => {
+                    return <li className="message"
+                               style={innerMessage.text.indexOf(auth.github.username) > -1 ? {
+                          background: "rgba(0,0,255,.05)",
+                          "font-size": '2rem'
+                          } : {}}
+                        >{innerMessage.text}</li>
+                  })}
+                </ol>
+              </li>
+            })}
           </ol>
         </div>
-        <form className="new-message-form">
+        <div className="new-message-form">
           <div className="new-message">
-            <input ref="message" type="text" placeholder="say something..."/>
+            <input ref="message" type="text" placeholder="say something..." value={messageToSend}
+                   onKeyUp={(e) => {
+                      if (e.keyCode === 13) {
+                        sendMessage(auth.uid, auth.github.username, auth.github.profileImageURL, e.target.value)
+                        this.setState({
+                          messageToSend: ''
+                        })
+                      }
+                   }}
+                  onChange={(e) => {
+                      this.setState({
+                        messageToSend: e.target.value
+                      })
+                    }}/>
           </div>
-        </form>
+        </div>
       </div>
     )
   }

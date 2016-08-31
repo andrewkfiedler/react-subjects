@@ -72,16 +72,37 @@ ol.messages {
 }
 .message-group-avatar {
   position: absolute;
-  background-color: lightblue;
+  width: 80px;
+  text-align: center;
 }
 .message-group-avatar img {
   height: 40px;
 }
 
 ol.messages {
-  margin-left: 40px;
+  margin-left: 80px;
 }
 
 .message {
   padding: 8px 10px;
+}
+
+.chat-filter {
+  white-space: nowrap;
+}
+
+.chat-filter input {
+  display: inline-block;
+  vertical-align: middle;
+  height: 44px;
+  line-height: 44px;
+  padding: 10px;
+}
+
+.chat-filter .filter-username {
+  width: 80px;
+}
+
+.chat-filter .filter-content {
+  width: calc(100% - 80px);
 }
