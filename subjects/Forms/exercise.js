@@ -21,6 +21,35 @@ import { render } from 'react-dom'
 import serializeForm from 'form-serialize'
 
 const CheckoutForm = React.createClass({
+  getInitialState() {
+      return {
+        billingName: '',
+        billingState: '',
+        sameAsBilling: false,
+        shippingName: '',
+        shippingState: ''
+      }
+  },
+  determineShippingName(){
+    return this.state.sameAsBilling ? this.state.billingName : this.state.shippingName
+  },
+  determineShippingState() {
+    return this.state.sameAsBilling ? this.state.billingState: this.state.shippingState
+  },
+  updateShippingName(e) {
+    if (!this.state.sameAsBilling){
+        this.setState({
+          shippingName: e.target.value
+        })
+    }
+  },
+  updateShippingState(e) {
+    if (!this.state.sameAsBilling){
+      this.setState({
+        shippingState: e.target.value
+      })
+    }
+  },
   render() {
     return (
       <div>
@@ -29,23 +58,49 @@ const CheckoutForm = React.createClass({
           <fieldset>
             <legend>Billing Address</legend>
             <p>
-              <label>Billing Name: <input type="text"/></label>
+              <label>Billing Name:
+                <input type="text" value={this.state.billingName}
+                       onChange={(e) => this.setState({billingName: e.target.value})}
+                  />
+              </label>
             </p>
             <p>
-              <label>Billing State: <input type="text" size="2"/></label>
+              <label>Billing State:
+                <input type="text" size="2" value={this.state.billingState}
+                       onChange={(e) => this.setState({billingState: e.target.value})}
+                    />
+                {(this.state.billingState.length > 2) && (
+                  <span style={{color: "red"}}>Warning, you should be using the 2 character abbreviation.</span>
+                  )}
+              </label>
             </p>
           </fieldset>
 
           <br/>
 
           <fieldset>
-            <label><input type="checkbox"/> Same as billing</label>
+            <label>
+              <input type="checkbox" checked={this.state.sameAsBilling}
+                     onChange={(e) => this.setState({sameAsBilling: e.target.checked})}
+                  />
+              Same as billing
+            </label>
             <legend>Shipping Address</legend>
             <p>
-              <label>Shipping Name: <input type="text"/></label>
+              <label>Shipping Name:
+                <input type="text" value={this.determineShippingName()}
+                       onChange={this.updateShippingName}
+                    />
+              </label>
             </p>
             <p>
-              <label>Shipping State: <input type="text" size="2"/></label>
+              <label>Shipping State:
+                <input type="text" size="2" value={this.determineShippingState()}
+                    onChange={this.updateShippingState}/>
+                {(this.determineShippingState().length > 2) && (
+                    <span style={{color: "red"}}>Warning, you should be using the 2 character abbreviation.</span>
+                )}
+              </label>
             </p>
           </fieldset>
         </form>
