@@ -89,14 +89,14 @@ const CheckoutForm = React.createClass({
             <p>
               <label>Shipping Name:
                 <input type="text" value={this.determineShippingName()}
-                       onChange={this.updateShippingName}
+                       onChange={this.updateShippingName} disabled={this.state.sameAsBilling}
                     />
               </label>
             </p>
             <p>
               <label>Shipping State:
                 <input type="text" size="2" value={this.determineShippingState()}
-                    onChange={this.updateShippingState}/>
+                    onChange={this.updateShippingState} disabled={this.state.sameAsBilling}/>
                 {(this.determineShippingState().length > 2) && (
                     <span style={{color: "red"}}>Warning, you should be using the 2 character abbreviation.</span>
                 )}
