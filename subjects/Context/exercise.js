@@ -21,9 +21,13 @@ import React from 'react'
 import { render } from 'react-dom'
 
 class Form extends React.Component {
-  static contextTypes = {
+  static childContextTypes = {
     handleSubmit: React.PropTypes.func
   }
+
+  getChildContext = () => ({
+    handleSubmit: this.props.handleSubmit
+  })
   render() {
     return <div>{this.props.children}</div>
   }
@@ -63,13 +67,6 @@ class TextInput extends React.Component {
 }
 
 class App extends React.Component {
-  static childContextTypes = {
-      handleSubmit: React.PropTypes.func
-  }
-
-  getChildContext = () => ({
-    handleSubmit: this.handleSubmit
-  })
 
   handleSubmit = () => {
     alert('YOU WIN!')
@@ -80,7 +77,7 @@ class App extends React.Component {
       <div>
         <h1>This isn't even my final <code>&lt;Form/&gt;</code>!</h1>
 
-        <Form>
+        <Form handleSubmit={this.handleSubmit}>
           <p>
             <TextInput name="firstName" placeholder="First Name"/> {' '}
             <TextInput name="lastName" placeholder="Last Name"/>
