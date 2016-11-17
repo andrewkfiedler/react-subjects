@@ -10,30 +10,52 @@ const { func, any } = PropTypes
 //
 // Make this work like a normal <select><option/></select>
 
+class Option extends React.Component {
+  render() {
+    return (
+      <div className="option" onClick={() => {
+        this.props.onClick(this.props.value)
+      }}>{this.props.children}</div>
+    )
+  }
+}
+
 class Select extends React.Component {
   static propTypes = {
     onChange: func,
     value: any,
     defaultValue: any
   }
-
-  render() {
-    return (
-      <div className="select">
-        <div className="label">label <span className="arrow">▾</span></div>
-        <div className="options">
-          {this.props.children}
-        </div>
-      </div>
-    )
+  state = {
+    isOpen: false,
+    value: this.props.value || this.props.defaultValue
   }
-}
+  toggleOpen = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    })
+  }
 
-
-class Option extends React.Component {
   render() {
+    const children = React.Children.map(this.props.children, (child) => {
+      return React.cloneElement(child, {
+        onClick: (value) => {
+          this.setState({
+            value: value,
+            isOpen: false
+          })}
+      })
+    })
     return (
-      <div className="option">{this.props.children}</div>
+        <div className="select">
+          <div className="label" onClick={this.toggleOpen}>{this.state.value} <span className="arrow">▾</span></div>
+          <div className="options"
+              style={{
+                display: this.state.isOpen ? 'block' : 'none'
+              }}>
+            {children}
+          </div>
+        </div>
     )
   }
 }
@@ -43,7 +65,7 @@ class App extends React.Component {
     selectValue: 'dosa'
   }
 
-  setToMintChutney() {
+  setToMintChutney = () => {
    this.setState({selectValue: 'mint-chutney'})
   }
 
