@@ -45,7 +45,7 @@ class Modal extends React.Component {
 
   render() {
     return (
-      <div className={`modal fade ${this.props.isOpen ? 'show' : 'hide'}`}>
+      <div className={`modal fade`}>
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
