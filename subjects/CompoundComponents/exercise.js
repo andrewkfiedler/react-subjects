@@ -32,30 +32,6 @@
 import React, { PropTypes } from 'react'
 import { render } from 'react-dom'
 
-class RadioGroup extends React.Component {
-  static propTypes = {
-    defaultValue: PropTypes.string
-  }
-
-  render() {
-    return <div>{this.props.children}</div>
-  }
-}
-
-class RadioOption extends React.Component {
-  static propTypes = {
-    value: PropTypes.string
-  }
-
-  render() {
-    return (
-      <div>
-        <RadioIcon isSelected={false}/> {this.props.children}
-      </div>
-    )
-  }
-}
-
 class RadioIcon extends React.Component {
   static propTypes = {
     isSelected: PropTypes.bool.isRequired
@@ -72,14 +48,70 @@ class RadioIcon extends React.Component {
           width: 16,
           display: 'inline-block',
           cursor: 'pointer',
-          background: this.props.isSelected ? 'rgba(0, 0, 0, 0.05)' : ''
+          background: this.props.isSelected ? 'rgba(0, 0, 0, 0.05)' : '',
+          verticalAlign: 'middle',
+          boxSizing: 'border-box'
         }}
       />
     )
   }
 }
 
+class RadioOption extends React.Component {
+  static propTypes = {
+    value: PropTypes.string
+  }
+
+  render() {
+    return (
+        <div
+            onClick={() => {
+               this.props.onSelect(this.props.value)
+            }}
+            style={{
+              cursor: 'pointer',
+              padding: '10px',
+              lineHeight: '16px',
+              boxSizing: 'border-box'
+            }}>
+          <RadioIcon isSelected={this.props.selectedValue === this.props.value}/>
+          <span style={{
+            display: 'inline-block',
+            verticalAlign: 'middle',
+            marginLeft: '5px'
+          }}>{this.props.children}</span>
+        </div>
+    )
+  }
+}
+
+class RadioGroup extends React.Component {
+  state = {
+    selectedValue: this.props.defaultValue || "fm"
+  }
+  static propTypes = {
+    defaultValue: PropTypes.string,
+    activeIndex: PropTypes.number
+  }
+  onSelect(value) {
+    this.setState({
+      selectedValue: value
+    })
+  }
+
+  render() {
+    const children = React.Children.map(this.props.children, (child, index) => {
+      return React.cloneElement(child, {
+        selectedValue: this.state.selectedValue,
+        onSelect: (value) => this.onSelect(value)
+      })
+    })
+    return <div>{children}</div>
+  }
+}
+
 class App extends React.Component {
+
   render() {
     return (
       <div>
