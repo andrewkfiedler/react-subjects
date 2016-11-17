@@ -16,7 +16,7 @@ class Modal extends React.Component {
     onClose: PropTypes.func,
     children: PropTypes.node
   }
-
+  //similar to initialize or first render
   componentDidMount() {
     this.doImperativeWork()
 
@@ -28,7 +28,7 @@ class Modal extends React.Component {
         this.props.onClose()
     })
   }
-
+  //similar to events
   componentDidUpdate(prevProps) {
     if (prevProps.isOpen !== this.props.isOpen)
       this.doImperativeWork()

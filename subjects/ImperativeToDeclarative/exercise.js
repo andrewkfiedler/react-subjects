@@ -12,12 +12,40 @@ import 'bootstrap-webpack'
 class Modal extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
-    children: PropTypes.node
+    children: PropTypes.node,
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func
+  }
+
+  //similar to initialize or first render
+  componentDidMount() {
+    this.doImperativeWork()
+
+    // This is only necessary to keep state in sync
+    // with the DOM. Since we're keeping state now,
+    // we should make sure it's accurate.
+    $(findDOMNode(this)).on('hidden.bs.modal', () => {
+      if (this.props.onClose)
+        this.props.onClose()
+    })
+  }
+  //similar to events
+  componentDidUpdate(prevProps) {
+    if (prevProps.isOpen !== this.props.isOpen)
+      this.doImperativeWork()
+  }
+
+  doImperativeWork() {
+    if (this.props.isOpen === true) {
+      $(findDOMNode(this)).modal('show')
+    } else {
+      $(findDOMNode(this)).modal('hide')
+    }
   }
 
   render() {
     return (
-      <div className="modal fade">
+      <div className={`modal fade ${this.props.isOpen ? 'show' : 'hide'}`}>
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -34,12 +62,16 @@ class Modal extends React.Component {
 }
 
 class App extends React.Component {
+  state = {
+    isModalOpen: false
+  }
+
   openModal = () => {
-    $(findDOMNode(this.refs.modal)).modal('show')
+    this.setState({ isModalOpen: true })
   }
 
   closeModal = () => {
-    $(findDOMNode(this.refs.modal)).modal('hide')
+    this.setState({ isModalOpen: false })
   }
 
   render() {
@@ -52,7 +84,10 @@ class App extends React.Component {
           onClick={this.openModal}
         >open modal</button>
 
-        <Modal ref="modal" title="Declarative is better">
+        <Modal
+               ref="modal"
+               title="Declarative is better" isOpen={this.state.isModalOpen}
+              onClose={this.closeModal}>
           <p>Calling methods on instances is a FLOW not a STOCK!</p>
           <p>It’s the dynamic process, not the static program in text space.</p>
           <p>You have to experience it over time, rather than in snapshots of state.</p>
