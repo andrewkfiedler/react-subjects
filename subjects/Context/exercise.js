@@ -22,11 +22,15 @@ import { render } from 'react-dom'
 
 class Form extends React.Component {
   static childContextTypes = {
-    handleSubmit: React.PropTypes.func
+    form: React.PropTypes.shape({
+      handleSubmit: React.PropTypes.func.isRequired
+    }).isRequired
   }
 
   getChildContext = () => ({
-    handleSubmit: this.props.handleSubmit
+    form: {
+      handleSubmit: this.props.handleSubmit
+    }
   })
   render() {
     return <div>{this.props.children}</div>
@@ -35,22 +39,26 @@ class Form extends React.Component {
 
 class SubmitButton extends React.Component {
   static contextTypes = {
-    handleSubmit: React.PropTypes.func
+    form: React.PropTypes.shape({
+      handleSubmit: React.PropTypes.func.isRequired
+    }).isRequired
   }
 
   render() {
-    return <button onClick={this.context.handleSubmit}>{this.props.children}</button>
+    return <button onClick={this.context.form.handleSubmit}>{this.props.children}</button>
   }
 }
 
 class TextInput extends React.Component {
   static contextTypes = {
-    handleSubmit: React.PropTypes.func
+    form: React.PropTypes.shape({
+      handleSubmit: React.PropTypes.func.isRequired
+    }).isRequired
   }
 
   onKeyDown = (event) => {
     if (event.keyCode === 13){
-      this.context.handleSubmit();
+      this.context.form.handleSubmit();
     }
   }
 
