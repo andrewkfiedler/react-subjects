@@ -35,6 +35,9 @@ class Select extends React.Component {
       isOpen: !this.state.isOpen
     })
   }
+  isControlled = () => {
+    return this.props.value != null
+  }
 
   render() {
     let value = this.props.value || this.state.value
