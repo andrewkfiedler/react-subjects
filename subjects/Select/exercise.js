@@ -36,7 +36,7 @@ class Select extends React.Component {
     })
   }
   isControlled = () => {
-    return this.props.value !== undefined
+    return this.props.value != null
   }
 
   render() {
