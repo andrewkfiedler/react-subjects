@@ -32,6 +32,7 @@ class GeoAddress extends React.Component {
   }
   componentDidUpdate = (prevProps) => {
     if (this.propsDidUpdate(prevProps) && this.props.longitude && this.props.latitude) {
+      this.setState({address: null})
       getAddressFromCoords(this.props.latitude, this.props.longitude).then((address) => {
         this.setState({address: address})
       })
