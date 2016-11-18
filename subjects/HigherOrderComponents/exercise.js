@@ -9,8 +9,32 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-const withMousePosition = (Component) => {
-  return Component
+const withMouse = (Component) => {
+  return class ComponentWithMouse extends React.Component {
+    state = {
+        mouse: {
+          x: 0,
+          y: 0
+        }
+    }
+    onMouseMove = (event) => {
+      this.setState({
+        mouse: {
+          x: event.clientX,
+          y: event.clientY
+        }
+      })
+    }
+    componentDidMount = () => {
+      document.addEventListener('mousemove', this.onMouseMove);
+    }
+    componentWillUnmount = () => {
+      document.removeEventListener('mousemove', this.onMouseMove);
+    }
+    render() {
+      return <Component {...this.props} mouse={this.state.mouse}/>
+    }
+  }
 }
 
 class App extends React.Component {
@@ -32,7 +56,7 @@ class App extends React.Component {
   }
 }
 
-const AppWithMouse = withMousePosition(App)
+const AppWithMouse = withMouse(App)
 
 render(<AppWithMouse/>, document.getElementById('app'))
 
