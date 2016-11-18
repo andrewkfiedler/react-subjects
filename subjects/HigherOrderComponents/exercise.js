@@ -9,22 +9,23 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-const withMouse = (Component) => {
+const withMouse = (Component, offset) => {
   return class ComponentWithMouse extends React.Component {
     state = {
         mouse: {
-          x: 0,
-          y: 0
+          x: 0 + offset,
+          y: 0 + offset
         }
     }
     onMouseMove = (event) => {
       this.setState({
         mouse: {
-          x: event.clientX,
-          y: event.clientY
+          x: event.clientX + offset,
+          y: event.clientY + offset
         }
       })
     }
+
     componentDidMount = () => {
       document.addEventListener('mousemove', this.onMouseMove);
     }
@@ -56,7 +57,7 @@ class App extends React.Component {
   }
 }
 
-const AppWithMouse = withMouse(App)
+const AppWithMouse = withMouse(withMouse(App, 500), 0)
 
 render(<AppWithMouse/>, document.getElementById('app'))
 
