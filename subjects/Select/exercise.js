@@ -37,7 +37,12 @@ class Select extends React.Component {
   }
 
   render() {
+    let value = this.props.value || this.state.value
+    let label
     const children = React.Children.map(this.props.children, (child) => {
+      if (child.props.value === value){
+        label = child.props.children
+      }
       return React.cloneElement(child, {
         onClick: (value) => {
           this.setState({
@@ -50,7 +55,7 @@ class Select extends React.Component {
     })
     return (
         <div className="select">
-          <div className="label" onClick={this.toggleOpen}>{this.props.value || this.state.value} <span className="arrow">▾</span></div>
+          <div className="label" onClick={this.toggleOpen}>{label} <span className="arrow">▾</span></div>
           <div className="options"
               style={{
                 display: this.state.isOpen ? 'block' : 'none'
