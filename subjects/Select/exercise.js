@@ -28,7 +28,7 @@ class Select extends React.Component {
   }
   state = {
     isOpen: false,
-    value: this.props.value || this.props.defaultValue
+    value: this.props.defaultValue
   }
   toggleOpen = () => {
     this.setState({
@@ -43,12 +43,14 @@ class Select extends React.Component {
           this.setState({
             value: value,
             isOpen: false
-          })}
+          })
+          this.props.onChange && this.props.onChange(value)
+        }
       })
     })
     return (
         <div className="select">
-          <div className="label" onClick={this.toggleOpen}>{this.state.value} <span className="arrow">▾</span></div>
+          <div className="label" onClick={this.toggleOpen}>{this.props.value || this.state.value} <span className="arrow">▾</span></div>
           <div className="options"
               style={{
                 display: this.state.isOpen ? 'block' : 'none'
@@ -82,7 +84,7 @@ class App extends React.Component {
 
         <Select
           value={this.state.selectValue}
-          onChange={(selectValue) => this.setState({ selectValue })}
+          onChange={(selectValue) => this.setState({ selectValue: selectValue })}
         >
           <Option value="tikka-masala">Tikka Masala</Option>
           <Option value="tandoori-chicken">Tandoori Chicken</Option>
