@@ -20,48 +20,90 @@ import { render } from 'react-dom'
 import LoadingDots from './utils/LoadingDots'
 import getAddressFromCoords from './utils/getAddressFromCoords'
 
-class App extends React.Component {
+class GeoAddress extends React.Component {
+  static propTypes = {
+    children: React.PropTypes.func.isRequired
+  }
   state = {
-    coords: {
-      latitude: null,
-      longitude: null
+    address: null
+  }
+  propsDidUpdate = (prevProps) => {
+    return prevProps !== this.props
+  }
+  componentDidUpdate = (prevProps) => {
+    if (this.propsDidUpdate(prevProps) && this.props.longitude && this.props.latitude) {
+      getAddressFromCoords(this.props.latitude, this.props.longitude).then((address) => {
+        this.setState({address: address})
+      })
     }
   }
+  render() {
+    return this.props.children(this.state);
+  }
+}
 
+class GeoPosition extends React.Component {
+  static propTypes = {
+    children: React.PropTypes.func.isRequired
+  }
+  state = {
+    coords: {
+      longitude: null,
+      latitude: null
+    }
+  }
   componentDidMount() {
     this.geoId = navigator.geolocation.watchPosition(
-      (position) => {
-        this.setState({
-          coords: {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          }
-        })
-      },
-      (error) => {
-        this.setState({ error })
-      }
+        (position) => {
+          this.setState({
+            coords: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            }
+          })
+        },
+        (error) => {
+          this.setState({error})
+        }
     )
   }
-
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.geoId)
   }
+  render() {
+    return this.props.children(this.state)
+  }
+}
 
+class App extends React.Component {
   render() {
     return (
       <div>
         <h1>Geolocation</h1>
-        {this.state.error ? (
-          <div>{this.state.error.message}</div>
-        ) : (
-          <dl>
-            <dt>Latitude</dt>
-            <dd>{this.state.coords.latitude || <LoadingDots/>}</dd>
-            <dt>Longitude</dt>
-            <dd>{this.state.coords.longitude || <LoadingDots/>}</dd>
-          </dl>
-        )}
+        <GeoPosition>
+          {({coords, error}) => (
+              error ? (
+                  <div>{error.message}</div>
+              ) : (
+                  <dl>
+                    <dt>Latitude</dt>
+                    <dd>{coords.latitude || <LoadingDots/>}</dd>
+                    <dt>Longitude</dt>
+                    <dd>{coords.longitude || <LoadingDots/>}</dd>
+                  </dl>
+              )
+          )}
+
+        </GeoPosition>
+        <GeoPosition>
+          {({ coords }) => (
+              <GeoAddress latitude={coords.latitude} longitude={coords.longitude}>
+                {({address}) => (
+                   <h1>{address || <LoadingDots/>}</h1>
+                )}
+              </GeoAddress>
+          )}
+          </GeoPosition>
       </div>
     )
   }
