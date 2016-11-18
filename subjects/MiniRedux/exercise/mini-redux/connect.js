@@ -6,8 +6,14 @@ export default function connect(mapStateToProps) {
       static contextTypes = {
         store: React.PropTypes.object.isRequired
       }
+      componentDidMount = () => {
+        this.context.store.listen(() => {
+          this.forceUpdate()
+        })
+      }
       render() {
-        return <Component dispatch={this.context.store.dispatch} counter={this.context.store.getState()}/>;
+        const props = mapStateToProps(this.context.store.getState())
+        return <Component {...props} dispatch={this.context.store.dispatch}/>;
       }
     }
   }
